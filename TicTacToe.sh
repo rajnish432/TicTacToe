@@ -28,6 +28,12 @@ function playerLetterAssignment()
 	else
 		playerLetter=0;
 	fi
+	if [[ $playerLetter == X ]]
+	then
+		echo "Player plays first"
+	else
+		echo "computer Plays first"
+	fi
 }
 
 gameBoard

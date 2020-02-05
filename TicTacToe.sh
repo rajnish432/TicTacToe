@@ -19,4 +19,16 @@ function gameBoard()
 	done
 	echo "---------------"
 }
+
+function playerLetterAssignment()
+{
+	if [[ $((RANDOM%2)) -eq 0 ]]
+	then
+		playerLetter=X
+	else
+		playerLetter=0;
+	fi
+}
+
 gameBoard
+playerLetterAssignment

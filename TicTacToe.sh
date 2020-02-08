@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash 
 
 echo "WELCOME TO TIC_TAC_TOE SIMULATOR";
 declare -A board
@@ -7,12 +7,13 @@ COLUMNS=3;
 totalMove=0;
 winner=false;
 flag=0;
+checkCount=0;
 
 function initializeBoard()
 {
-   for (( i=0 ; i<ROWS; i++ ))
+   for (( i=0 ; i<$ROWS; i++ ))
    do
-      for (( j=0 ; j<COLUMNS; j++ ))
+      for (( j=0 ; j<$COLUMNS; j++ ))
       do
          board[$i,$j]="+";
       done
@@ -21,10 +22,10 @@ function initializeBoard()
 
 function gameBoard()
 {
-	for (( i=0; i<ROWS; i++ ))
+	for (( i=0; i<$ROWS; i++ ))
 	do
 		echo "---------------"
-			for (( j=0; j<COLUMNS; j++))
+			for (( j=0; j<$COLUMNS; j++))
 			do
 				echo -n "| ${board[$i,$j]} |"
 			done
@@ -53,41 +54,30 @@ function playerLetterAssignment()
 	fi
 }
 
-function winningRow()
+function winningRowAndColumnAndDiagonal()
 {
-	for (( i=0; i<ROWS; i++ ))
+	for (( i=0; i<$ROWS; i++ ))
 	do
-		for ((j=0; j<COLUMNS; j++))
+		for (( j=0; j<$COLUMNS; j++ ))
 		do
-		if [[ ${board[$i,$j]} == ${board[$i,$((j+1))]} && ${board[$i,$((j+1))]} == ${board[$i,$((j+2))]} && ${board[$i,$j]} == $1 ]]
+		if [[ ${board[$i,$j]} == $1 && ${board[$i,$((j+1))]} == $1 && ${board[$i,$((j+2))]} == $1 ]]
+		then
+			winner=true;
+		fi
+      if [[ ${board[$i,$j]} == $1  && ${board[$((i+1)),$j]} == $1 && ${board[$((i+2)),$j]} == $1 ]]
+		then
+			winner=true;
+		fi
+		if [[ ${board[$i,$j]} == $1  && ${board[$((i+1)),$((j+1))]} == $1 && ${board[$((i+2)),$((j+2))]} == $1 ]]
+		then
+			winner=true;
+		fi
+		if [[ ${board[$i,$((j+2))]} == $1 && ${board[$((i+1)),$((j+1))]} == $1 && ${board[$((i+2)),$j]} == $1 ]]
 		then
 			winner=true;
 		fi
 		done
 	done
-}
-
-function winningColumn()
-{
-   for (( i=0; i<ROWS; i++ ))
-   do
-      for ((j=0; j<COLUMNS; j++))
-      do
-      if [[ ${board[$i,$j]} == ${board[$((i+1)),$j]} && ${board[$((i+1)),$j]} == ${board[$((i+2)),$j]} && ${board[$i,$j]} == $1 ]]
-      then
-         winner=true;
-      fi
-      done
-   done
-}
-
-function winningDiagonal()
-{
-	result=${board[$1,$2]}${board[$3,$4]}${board[$5,$6]}
-	if [[ $result == XXX || $result == 000 ]]
-	then
-		winner=true;
-	fi
 }
 
 function gamePlay()
@@ -103,26 +93,20 @@ function gamePlay()
 				then
 					board[$row,$col]=$playerLetter
 					gameBoard;
-					winningRow	$playerLetter
-					winningColumn	$playerLetter
-					winningDiagonal 0 0 1 1 2 2
-					winningDiagonal 0 2 1 1 2 0
+					winningRowAndColumnAndDiagonal $playerLetter
 					getWinner "Player"
 					flag=1
 					((totalMove++))
 				fi
 		elif [[ $flag -eq 1 ]]
 		then
-			row=$((RANDOM%3))
-			col=$((RANDOM%3))
-				if [[ ${board[$row,$col]} == + ]]
+				row=$((RANDOM%3))
+				col=$((RANDOM%3))
+			 	if [[ ${board[$row,$col]} == + ]]
       		then
 					board[$row,$col]=$computerLetter
 					gameBoard;
-					winningRow $computerLetter
-					winningColumn $computerLetter
-					winningDiagonal 0 0 1 1 2 2
-					winningDiagonal 0 2 1 1 2 0
+					winningRowAndColumnAndDiagonal $computerLetter
 					getWinner "computer"
 					flag=0;
 					((totalMove++))

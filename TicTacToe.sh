@@ -8,16 +8,17 @@ totalMove=0;
 winner=false;
 flag=0;
 checkCount=0;
+block=0;
 
 function initializeBoard()
 {
-   for (( i=0 ; i<$ROWS; i++ ))
-   do
-      for (( j=0 ; j<$COLUMNS; j++ ))
-      do
-         board[$i,$j]="+";
-      done
-   done
+	for (( i=0 ; i<$ROWS; i++ ))
+	do
+		for (( j=0 ; j<$COLUMNS; j++ ))
+		do
+			board[$i,$j]="+";
+		done
+	done
 }
 
 function gameBoard()
@@ -80,27 +81,57 @@ function winningRowAndColumnAndDiagonal()
 	done
 }
 
+function checkBlockComputer()
+{
+	for (( row1=0; row1<$ROWS ; row1++ ))
+	do
+		for (( col1=0; col1<$COLUMNS ; col1++ ))
+		do
+			if [[ ${board[$row1,$col1]} == + ]]
+			then
+				board[$row1,$col1]=$playerLetter
+				winningRowAndColumnAndDiagonal $playerLetter
+				if [[ $winner == true ]]
+				then
+						board[$row1,$col1]=$computerLetter
+						gameBoard;
+						block=1;
+						winner=false;
+						getWinner "computer"
+						break;
+				else
+					board[$row1,$col1]="+"
+				fi
+			fi
+		done
+		if [ $block -eq 1 ]
+		then
+			break;
+		fi
+	done
+}
+
 function checkWinComputer()
 {
-   for (( row=0; row<$ROWS ; row++ ))
-   do
-      for (( col=0; col<$COLUMNS ; col++ ))
-      do
-         if [[ ${board[$row,$col]} == + ]]
-         then
-            board[$row,$col]=$computerLetter
-            winningRowAndColumnAndDiagonal $computerLetter
-            if [[ $winner == false ]]
-            then
-               board[$row,$col]="+";
-            else
-               gameBoard
+	for (( row=0; row<$ROWS ; row++ ))
+	do
+		for (( col=0; col<$COLUMNS ; col++ ))
+		do
+			if [[ ${board[$row,$col]} == + ]]
+			then
+				board[$row,$col]=$computerLetter
+				winningRowAndColumnAndDiagonal $computerLetter
+				if [[ $winner == false ]]
+				then
+					board[$row,$col]="+";
+				else
+					gameBoard
 					getWinner "computer"
-               exit;
-            fi
-         fi
-      done
-   done
+					exit;
+				fi
+			fi
+		done
+	done
 }
 
 function gamePlay()
@@ -124,15 +155,25 @@ function gamePlay()
 		elif [[ $flag -eq 1 ]]
 		then
 				checkWinComputer
-				row=$((RANDOM%3))
-				col=$((RANDOM%3))
-			 	if [[ ${board[$row,$col]} == + ]]
+				checkBlockComputer
+				if [ $block -eq 1 ]
 				then
-					board[$row,$col]=$computerLetter
-					gameBoard;
-					winningRowAndColumnAndDiagonal $computerLetter
-					flag=0;
 					((totalMove++))
+					flag=0;
+				fi
+				block=0;
+				if [ $flag -eq 1 ]
+				then
+					row=$((RANDOM%3))
+					col=$((RANDOM%3))
+					if [[ ${board[$row,$col]} == + ]]
+					then
+						board[$row,$col]=$computerLetter
+						gameBoard;
+						winningRowAndColumnAndDiagonal $computerLetter
+						flag=0;
+						((totalMove++))
+					fi
 				fi
 		fi
 	done

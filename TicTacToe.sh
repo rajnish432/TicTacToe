@@ -1,4 +1,4 @@
-#! /bin/bash 
+#! /bin/bash
 
 echo "WELCOME TO TIC_TAC_TOE SIMULATOR";
 declare -A board
@@ -64,7 +64,7 @@ function winningRowAndColumnAndDiagonal()
 		then
 			winner=true;
 		fi
-      if [[ ${board[$i,$j]} == $1  && ${board[$((i+1)),$j]} == $1 && ${board[$((i+2)),$j]} == $1 ]]
+		if [[ ${board[$i,$j]} == $1  && ${board[$((i+1)),$j]} == $1 && ${board[$((i+2)),$j]} == $1 ]]
 		then
 			winner=true;
 		fi
@@ -78,6 +78,29 @@ function winningRowAndColumnAndDiagonal()
 		fi
 		done
 	done
+}
+
+function checkWinComputer()
+{
+   for (( row=0; row<$ROWS ; row++ ))
+   do
+      for (( col=0; col<$COLUMNS ; col++ ))
+      do
+         if [[ ${board[$row,$col]} == + ]]
+         then
+            board[$row,$col]=$computerLetter
+            winningRowAndColumnAndDiagonal $computerLetter
+            if [[ $winner == false ]]
+            then
+               board[$row,$col]="+";
+            else
+               gameBoard
+					getWinner "computer"
+               exit;
+            fi
+         fi
+      done
+   done
 }
 
 function gamePlay()
@@ -100,14 +123,14 @@ function gamePlay()
 				fi
 		elif [[ $flag -eq 1 ]]
 		then
+				checkWinComputer
 				row=$((RANDOM%3))
 				col=$((RANDOM%3))
 			 	if [[ ${board[$row,$col]} == + ]]
-      		then
+				then
 					board[$row,$col]=$computerLetter
 					gameBoard;
 					winningRowAndColumnAndDiagonal $computerLetter
-					getWinner "computer"
 					flag=0;
 					((totalMove++))
 				fi
@@ -131,4 +154,3 @@ function getWinner()
 initializeBoard
 gameBoard
 gamePlay
-

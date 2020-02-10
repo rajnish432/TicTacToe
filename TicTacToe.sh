@@ -9,6 +9,7 @@ winner=false;
 flag=0;
 checkCount=0;
 block=0;
+sidesFlag=0;
 
 function initializeBoard()
 {
@@ -87,6 +88,7 @@ function checkBlockComputer()
 	do
 		for (( col1=0; col1<$COLUMNS ; col1++ ))
 		do
+			echo "block"
 			if [[ ${board[$row1,$col1]} == + ]]
 			then
 				board[$row1,$col1]=$playerLetter
@@ -140,42 +142,86 @@ function takeCorners()
 	do
 		for (( j=0; j<$COLUMNS; j+2 ))
 	 	do
+			echo "corner"
 			if [[ ${board[$i,$j]} == + ]]
 			then
 				board[$i,$j]=$computerLetter;
+				gameBoard;
 				block=2
 				break;
 			elif [[ ${board[$i,$((j+2))]} == + ]]
 			then
 				board[$i,$((j+2))]=$computerLetter
+				gameBoard;
 				block=2
 				break;
 			elif [[ ${board[$((i+2)),$j]} == + ]]
 			then
 				board[$((i+2)),$j]=$computerLetter
+				gameBoard;
 				block=2;
 				break;
 			elif [[ ${board[$((i+2)),$((j+2))]} == + ]]
 			then
 				board[$((i+2)),$((j+2))]=$computerLetter;
+				gameBoard;
+				block=2;
+				break;
+			elif [[ ${board[1,1]} == + ]]
+			then
+				board[1,1]=$computerLetter;
+				gameBoard;
 				block=2;
 				break;
 			else
-				if [[ ${board[1,1]} == + ]]
-				then
-					board[1,1]=$computerLetter;
-					break;
-				else
-					break;
-				fi
+				block=2;
+				sidesFlag=1;
+				break;
 			fi
 		done
-		gameBoard
 		if [ $block -eq 2 ]
 		then
 			break;
 		fi
 	done
+}
+
+function takeSides()
+{
+for (( r=0; r<$ROWS; r++ ))
+do
+	for (( c=0;c<$COLUMNS; c++ ))
+	do
+		echo "Sides"
+		if [[ ${board[$r,$((c+1))]} == + ]]
+		then
+			board[$r,$((c+1))]=$computerLetter;
+			block=3;
+			break;
+		elif [[ ${board[$((r+1)),$c]} == + ]]
+		then
+			board[$((r+1)),$c]=$computerLetter;
+			block=3;
+			break;
+		elif [[ ${board[$((r+1)),$((c+2))]} == + ]]
+		then
+			board[$((r+1)),$((c+2))]=$computerLetter;
+			block=3;
+			break;
+		elif [[ ${board[$((r+2)),$((c+1))]} == + ]]
+		then
+			board[$((r+2)),$((c+1))]=$computerLetter
+			block=3;
+			break;
+		else
+			break;
+		fi
+	done
+	if [[ $block -eq 3 ]]
+	then
+		break;
+	fi
+done
 }
 
 function gamePlay()
@@ -193,8 +239,8 @@ function gamePlay()
 					gameBoard;
 					winningRowAndColumnAndDiagonal $playerLetter
 					getWinner "Player"
-					flag=1
 					((totalMove++))
+					flag=1
 				fi
 		elif [[ $flag -eq 1 ]]
 		then
@@ -203,6 +249,16 @@ function gamePlay()
 				if [ $block -ne 1 ]
 				then
 					takeCorners
+				fi
+				if [[ $sidesFlag -eq 1 ]]
+				then
+					takeSides;
+					gameBoard;
+					((totalMove++))
+					flag=0;
+				fi
+				if [ $block -eq 2 ]
+				then
 					((totalMove++))
 					flag=0;
 				fi

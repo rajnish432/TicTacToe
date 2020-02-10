@@ -134,6 +134,44 @@ function checkWinComputer()
 	done
 }
 
+function takeCorners()
+{
+	for (( i=0; i<$ROWS; i+2 ))
+	do
+		for (( j=0; j<$COLUMNS; j+2 ))
+	 	do
+			if [[ ${board[$i,$j]} == + ]]
+			then
+				board[$i,$j]=$computerLetter;
+				block=2
+				break;
+			elif [[ ${board[$i,$((j+2))]} == + ]]
+			then
+				board[$i,$((j+2))]=$computerLetter
+				block=2
+				break;
+			elif [[ ${board[$((i+2)),$j]} == + ]]
+			then
+				board[$((i+2)),$j]=$computerLetter
+				block=2;
+				break;
+			elif [[ ${board[$((i+2)),$((j+2))]} == + ]]
+			then
+				board[$((i+2)),$((j+2))]=$computerLetter;
+				block=2;
+				break;
+			else
+				break;
+			fi
+		done
+		gameBoard
+		if [ $block -eq 2 ]
+		then
+			break;
+		fi
+	done
+}
+
 function gamePlay()
 {
 	playerLetterAssignment
@@ -156,6 +194,12 @@ function gamePlay()
 		then
 				checkWinComputer
 				checkBlockComputer
+				if [ $block -ne 1 ]
+				then
+					takeCorners
+					((totalMove++))
+					flag=0;
+				fi
 				if [ $block -eq 1 ]
 				then
 					((totalMove++))

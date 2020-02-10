@@ -161,7 +161,13 @@ function takeCorners()
 				block=2;
 				break;
 			else
-				break;
+				if [[ ${board[1,1]} == + ]]
+				then
+					board[1,1]=$computerLetter;
+					break;
+				else
+					break;
+				fi
 			fi
 		done
 		gameBoard

@@ -88,7 +88,6 @@ function checkBlockComputer()
 	do
 		for (( col1=0; col1<$COLUMNS ; col1++ ))
 		do
-			echo "block"
 			if [[ ${board[$row1,$col1]} == + ]]
 			then
 				board[$row1,$col1]=$playerLetter
@@ -142,7 +141,6 @@ function takeCorners()
 	do
 		for (( j=0; j<$COLUMNS; j+2 ))
 	 	do
-			echo "corner"
 			if [[ ${board[$i,$j]} == + ]]
 			then
 				board[$i,$j]=$computerLetter;
@@ -192,7 +190,6 @@ for (( r=0; r<$ROWS; r++ ))
 do
 	for (( c=0;c<$COLUMNS; c++ ))
 	do
-		echo "Sides"
 		if [[ ${board[$r,$((c+1))]} == + ]]
 		then
 			board[$r,$((c+1))]=$computerLetter;

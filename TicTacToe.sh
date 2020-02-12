@@ -1,17 +1,17 @@
 #! /bin/bash
 
 echo "WELCOME TO TIC_TAC_TOE SIMULATOR";
-declare -A board
-ROWS=3;
-COLUMNS=3;
-totalMove=0;
-winner=false;
-flag=0;
-checkCount=0;
-block=0;
-sidesFlag=0;
+declare -A board									#-->declare Board
+ROWS=3;											#-->Constant
+COLUMNS=3;										#-->Constant
+totalMove=0;										#-->Counter for stopping
+winner=false;										#---
+flag=0;											#	|
+checkCount=0;										#	|-->Flags
+block=0;										#	|
+sidesFlag=0;										#---
 
-function initializeBoard()
+function initializeBoard()						#-->Board reset function
 {
 	for (( i=0 ; i<$ROWS; i++ ))
 	do
@@ -22,7 +22,7 @@ function initializeBoard()
 	done
 }
 
-function gameBoard()
+function gameBoard()								#-->Board display function
 {
 	for (( i=0; i<$ROWS; i++ ))
 	do
@@ -36,7 +36,7 @@ function gameBoard()
 	echo "---------------"
 }
 
-function playerLetterAssignment()
+function playerLetterAssignment()			#-->Letter Assignment and Toss
 {
 	if [[ $((RANDOM%2)) -eq 0 ]]
 	then
@@ -56,7 +56,7 @@ function playerLetterAssignment()
 	fi
 }
 
-function winningRowAndColumnAndDiagonal()
+function winningRowAndColumnAndDiagonal()					#-->Game Winning Conditions
 {
 	for (( i=0; i<$ROWS; i++ ))
 	do
@@ -82,13 +82,12 @@ function winningRowAndColumnAndDiagonal()
 	done
 }
 
-function checkBlockComputer()
+function checkBlockComputer()								#-->Computer's Blocking  Condition
 {
 	for (( row1=0; row1<$ROWS ; row1++ ))
 	do
 		for (( col1=0; col1<$COLUMNS ; col1++ ))
 		do
-			echo "block"
 			if [[ ${board[$row1,$col1]} == + ]]
 			then
 				board[$row1,$col1]=$playerLetter
@@ -113,7 +112,7 @@ function checkBlockComputer()
 	done
 }
 
-function checkWinComputer()
+function checkWinComputer()								#-->Computer Winning Conditions
 {
 	for (( row=0; row<$ROWS ; row++ ))
 	do
@@ -136,40 +135,39 @@ function checkWinComputer()
 	done
 }
 
-function takeCorners()
+function takeCorners()									#-->Computer Occupies Corners Function
 {
-	for (( i=0; i<$ROWS; i+2 ))
+	for (( i=0; i<$ROWS; i++ ))
 	do
-		for (( j=0; j<$COLUMNS; j+2 ))
+		for (( j=0; j<$COLUMNS; j++ ))
 	 	do
-			echo "corner"
 			if [[ ${board[$i,$j]} == + ]]
 			then
 				board[$i,$j]=$computerLetter;
 				gameBoard;
 				block=2
 				break;
-			elif [[ ${board[$i,$((j+2))]} == + ]]
+			elif [[ ${board[$i,$((COLUMNS-1))]} == + ]]
 			then
-				board[$i,$((j+2))]=$computerLetter
+				board[$i,$((COLUMNS-1))]=$computerLetter
 				gameBoard;
 				block=2
 				break;
-			elif [[ ${board[$((i+2)),$j]} == + ]]
+			elif [[ ${board[$((ROWS-1)),$j]} == + ]]
 			then
-				board[$((i+2)),$j]=$computerLetter
+				board[$((ROWS-1)),$j]=$computerLetter
 				gameBoard;
 				block=2;
 				break;
-			elif [[ ${board[$((i+2)),$((j+2))]} == + ]]
+			elif [[ ${board[$((ROWS-1)),$((COLUMNS-1))]} == + ]]
 			then
-				board[$((i+2)),$((j+2))]=$computerLetter;
+				board[$((ROWS-1)),$((COLUMNS-1))]=$computerLetter;
 				gameBoard;
 				block=2;
 				break;
-			elif [[ ${board[1,1]} == + ]]
+			elif [[ ${board[$((ROWS/2)),$((COLUMNS/2))]} == + ]]
 			then
-				board[1,1]=$computerLetter;
+				board[$((ROWS/2)),$((COLUMNS/2))]=$computerLetter;
 				gameBoard;
 				block=2;
 				break;
@@ -186,34 +184,17 @@ function takeCorners()
 	done
 }
 
-function takeSides()
+function takeSides()										#-->Computer takes Sides if no centre and Corners are Available
 {
-for (( r=0; r<$ROWS; r++ ))
+for (( c=0; c<$COLUMNS; c++ ))
 do
-	for (( c=0;c<$COLUMNS; c++ ))
+	for (( r=0; r<$ROWS; r++ ))
 	do
-		echo "Sides"
-		if [[ ${board[$r,$((c+1))]} == + ]]
+		if [[ ${board[$r,$c]} == + ]]
 		then
-			board[$r,$((c+1))]=$computerLetter;
+			board[$r,$c]=$computerLetter;
+			gameBoard;
 			block=3;
-			break;
-		elif [[ ${board[$((r+1)),$c]} == + ]]
-		then
-			board[$((r+1)),$c]=$computerLetter;
-			block=3;
-			break;
-		elif [[ ${board[$((r+1)),$((c+2))]} == + ]]
-		then
-			board[$((r+1)),$((c+2))]=$computerLetter;
-			block=3;
-			break;
-		elif [[ ${board[$((r+2)),$((c+1))]} == + ]]
-		then
-			board[$((r+2)),$((c+1))]=$computerLetter
-			block=3;
-			break;
-		else
 			break;
 		fi
 	done
@@ -224,15 +205,15 @@ do
 done
 }
 
-function gamePlay()
+function gamePlay()										#-->Player and Computer Moves Function
 {
 	playerLetterAssignment
 	while [[ $totalMove -lt 9 ]]
 	do
 		if [[ $flag -eq 0 ]]
 		then
-			read -p "Enter the row: " row
-			read -p "Enter the Col: " col
+			read -p "Enter the row(0,1,2): " row
+			read -p "Enter the Col(0,1,2): " col
 				if [[ ${board[$row,$col]} == + ]]
 				then
 					board[$row,$col]=$playerLetter
@@ -289,7 +270,7 @@ function gamePlay()
 	fi
 }
 
-function getWinner()
+function getWinner()									#-->Winner Display Function
 {
 	if [[ $winner == true ]]
 	then
